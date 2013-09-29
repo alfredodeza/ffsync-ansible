@@ -8,6 +8,10 @@
   - name: add nginx ppa
     action: apt_repository repo=ppa:nginx/stable state=present
 
+  - name: create self-signed SSL cert
+    command: openssl req -new -nodes -x509 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${app_name}" -days 3650 -keyout /etc/nginx/ssl/server.key -out /etc/nginx/ssl/server.crt -extensions v3_ca creates=/etc/nginx/ssl/server.crt
+    notify: reload nginx
+
   - name: install common packages needed for python application development
     action: apt pkg=$item state=installed
     with_items:

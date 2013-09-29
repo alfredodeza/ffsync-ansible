@@ -2,9 +2,11 @@
   - name: ensure log directory
     action: file dest=${webapps_dir}/log state=directory
 
-  # If this is production, maybe I should think about installing a DEB
-  #- name: deploy code from repository
-  #  action: git repo=$repo_url dest=${webapps_dir}/${app_name}/src remote=$repo_remote version=$repo_version
+  - name: deploy code from repository
+    action: hg repo=$repo_url dest=${webapps_dir}/${app_name}/src purge=yes
+
+  - name: make build
+    action: command: make build chdir=${webapps_dir}/server-full
 
   - name: install dependencies into virtualenv
     action: pip requirements=${webapps_dir}/requirements.txt virtualenv=${webapps_dir}/venv state=present
