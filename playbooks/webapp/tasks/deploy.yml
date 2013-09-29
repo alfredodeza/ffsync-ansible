@@ -3,16 +3,13 @@
     action: file dest=${webapps_dir}/log state=directory
 
   - name: deploy code from repository
-    action: hg repo=$repo_url dest=${webapps_dir}/${app_name}/src purge=yes
+    action: hg repo=$repo_url dest=${webapps_dir}/${app_name}/src 
 
   - name: make build
-    command: make build chdir=${webapps_dir}/server-full
+    command: make build chdir=${webapps_dir}/ffsync/src
 
-  - name: install dependencies into virtualenv
-    action: pip requirements=${webapps_dir}/requirements.txt virtualenv=${webapps_dir}/venv state=present
-
-  - name: install webapp
-    action: shell cd ${webapps_dir}; ${webapps_dir}/venv/bin/python setup.py develop
+  #- name: install webapp
+  #  action: shell cd ${webapps_dir}; ${webapps_dir}/venv/bin/python setup.py develop
 
   - name: create supervisor program config
     action: template src=../templates/supervisor.ini dest=/etc/supervisor/${app_name}.ini

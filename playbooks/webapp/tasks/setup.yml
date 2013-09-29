@@ -17,6 +17,7 @@
       - postgresql
       - libpq-dev
       - nginx
+      - make
 
   - name: ensure ssl directory
     action: file dest=/etc/nginx/ssl state=directory
