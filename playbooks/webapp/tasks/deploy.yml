@@ -6,7 +6,7 @@
     action: hg repo=$repo_url dest=${webapps_dir}/${app_name}/src purge=yes
 
   - name: make build
-    action: command: make build chdir=${webapps_dir}/server-full
+    command: make build chdir=${webapps_dir}/server-full
 
   - name: install dependencies into virtualenv
     action: pip requirements=${webapps_dir}/requirements.txt virtualenv=${webapps_dir}/venv state=present

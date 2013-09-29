@@ -8,24 +8,22 @@
   - name: add nginx ppa
     action: apt_repository repo=ppa:nginx/stable state=present
 
-  - name: create self-signed SSL cert
-    command: openssl req -new -nodes -x509 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${app_name}" -days 3650 -keyout /etc/nginx/ssl/server.key -out /etc/nginx/ssl/server.crt -extensions v3_ca creates=/etc/nginx/ssl/server.crt
-    notify: reload nginx
-
-  - name: install common packages needed for python application development
+  - name: install system packages required by the Sync Server
     action: apt pkg=$item state=installed
     with_items:
-      - libpq-dev
-      - libxml2-dev
-      - libjpeg62
-      - libjpeg62-dev
-      - libfreetype6
-      - libfreetype6-dev
       - python-dev
       - python-setuptools
-      - python-imaging
       - git-core
+      - postgresql
+      - libpq-dev
       - nginx
+
+  - name: ensure ssl directory
+    action: file dest=/etc/nginx/ssl state=directory
+
+  - name: create self-signed SSL cert
+    command: openssl req -new -nodes -x509 -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${app_name}" -days 3650 -keyout /etc/nginx/ssl/server.key -out /etc/nginx/ssl/server.crt -extensions v3_ca creates=/etc/nginx/ssl/server.crt
+    notify: restart nginx
 
   - name: install pip
     action: easy_install name=pip
@@ -34,21 +32,12 @@
     action: pip name=$item state=present
     with_items:
       - virtualenv
+      - mercurial
+      - psycopg2
+      - gunicorn
 
   - name: install supervisor with pip pre
     action: pip name=supervisor state=present extra_args='--pre'
-
-  - name: symlink imaging library files
-    action: file src=/usr/lib/x86_64-linux-gnu/libfreetype.so dest=/usr/lib/libfreetype.so state=link
-
-  - name: symlink imaging library files
-    action: file src=/usr/lib/x86_64-linux-gnu/libz.so dest=/usr/lib/libz.so state=link
-
-  - name: symlink imaging library files
-    action: file src=/usr/lib/x86_64-linux-gnu/libjpeg.so.62 dest=/usr/lib/x86_64-linux-gnu/libjpeg.so state=link
-
-  - name: symlink imaging library files
-    action: file src=/usr/lib/x86_64-linux-gnu/libjpeg.so dest=/usr/lib/libjpeg.so state=link
 
   - name: remove default nginx site
     action: file path=/etc/nginx/sites-enabled/default state=absent
