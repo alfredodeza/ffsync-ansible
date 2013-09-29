@@ -1,0 +1,38 @@
+---
+### A dev server is a all-in one server
+- hosts: dev-server
+  user: vagrant
+  sudo: True
+  vars:
+     #nginx
+     connections : "1024"
+
+     #postgresql
+     bind_address: "127.0.0.1"
+     key_buffer: "16M"
+
+     is_10_up: "'$ansible_distribution_version' >= '10.04'"
+     is_ubuntu: "'$ansible_distribution' == 'Ubuntu'"
+
+     # webapp vars
+     app_name: ffsync
+     repo_url: https://hg.mozilla.org/services/server-full
+     repo_remote: origin
+     repo_version: tip
+     webapps_dir: /vagrant
+     wsgi_file: wsgi.py
+     wsgi_callable: application
+
+  tasks:
+      #- include: postgresql/tasks/setup.yml
+     - include: webapp/tasks/setup.yml
+     - include: webapp/tasks/deploy.yml
+
+  handlers:
+      #- include: postgresql/handlers/handler.yml
+     - include: webapp/handlers/deploy.yml
+
+# Do not run postgresql here, do it with ansible directly, make sure to have
+# keys to vagrant user otherwise it will fail
+
+# ansible-playbook -vvv -i deployment/playbooks/hosts deployment/playbooks/postgresql.yml

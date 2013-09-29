@@ -1,0 +1,31 @@
+---
+  - name: ensure log directory
+    action: file dest=${webapps_dir}/log state=directory
+
+  # If this is production, maybe I should think about installing a DEB
+  #- name: deploy code from repository
+  #  action: git repo=$repo_url dest=${webapps_dir}/${app_name}/src remote=$repo_remote version=$repo_version
+
+  - name: install dependencies into virtualenv
+    action: pip requirements=${webapps_dir}/requirements.txt virtualenv=${webapps_dir}/venv state=present
+
+  - name: install webapp
+    action: shell cd ${webapps_dir}; ${webapps_dir}/venv/bin/python setup.py develop
+
+  - name: create supervisor program config
+    action: template src=../templates/supervisor.ini dest=/etc/supervisor/${app_name}.ini
+    notify:
+      - restart app
+
+  - name: create nginx site config
+    action: template src=../templates/nginx_site.conf dest=/etc/nginx/sites-available/${app_name}.conf
+    notify:
+      - restart nginx
+
+  - name: link nginx config
+    action: file src=/etc/nginx/sites-available/${app_name}.conf dest=/etc/nginx/sites-enabled/${app_name}.conf state=link
+
+  - name: start app via supervisor
+    action: supervisorctl name=${app_name} state=restarted
+    notify:
+      - restart nginx

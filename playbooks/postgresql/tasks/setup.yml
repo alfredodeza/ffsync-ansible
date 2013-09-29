@@ -1,0 +1,16 @@
+---
+    - name: update apt repo
+      action: apt update-cache=yes
+
+    - name: install psycopg2
+      action: apt pkg=python-psycopg2 state=installed
+
+    - name: install postgresql
+      action: apt name=postgresql state=installed
+
+    - name: install libpq
+      action: apt name=libpq-dev state=installed
+
+    - name: service postgresql
+      action: service name=postgresql state=started
+

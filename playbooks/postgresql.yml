@@ -1,0 +1,44 @@
+---
+- hosts: postgresql-servers
+  user: vagrant
+  sudo: True
+  gather_facts: False
+
+
+  vars:
+     bind_address: "127.0.0.1"
+     key_buffer: "16M"
+
+  tasks:
+    - include: postgresql/tasks/setup.yml
+
+  handlers:
+     - include: postgresql/handlers/handler.yml
+
+- hosts: postgresql-servers
+  user: vagrant
+  sudo: True
+  sudo_user: postgres
+  gather_facts: False
+
+  vars:
+     bind_address: "127.0.0.1"
+     key_buffer: "16M"
+     dbname: ffsync
+     dbuser: ffsync
+  vars_prompt:
+    - name: "dbpassword"
+      prompt: "Enter PostgreSQL password: "
+      private: yes
+
+  tasks:
+    - name: create app database
+      action: postgresql_db db=ffsync
+
+    - name: ensure user has access to databassss
+      action: postgresql_user db={{dbname}} user={{dbuser}} password={{dbpassword}} role_attr_flags=NOSUPERUSER,NOCREATEDB
+
+     #- name: write my.cnf
+     #  action: template src='postgresql/templates/my.cnf.j2' dest='/etc/postgresql/conf.d/postgresqld-ansible.cnf'
+     #  notify:
+     #  - restart postgresql
