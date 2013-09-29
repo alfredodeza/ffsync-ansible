@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
 
 Vagrant.configure("2") do |config|
@@ -16,20 +18,20 @@ Vagrant.configure("2") do |config|
 
   # You can adjust this to the amount of CPUs your system has available
   config.vm.provider :vritualbox do |vb|
-      vb.config.vm.customize ["modifyvm", :id, "--memory", "512"]
+      vb.config.vm.customize ["modifyvm", :id, "--memory", "1024"]
       vb.customize ["modifyvm", :id, "--cpus", "4"]
   end
 
-  config.vm.provision :ansible do |ansible|
+  config.vm.provision "ansible" do |ansible|
     # point Vagrant at the location of your playbook you want to run
     ansible.playbook = "playbooks/setup-devserver.yml"
-    ansible.inventory_file = "playbooks/hosts"
+    ansible.inventory_path = "playbooks/hosts"
     ansible.verbose = true
 
     # the Vagrant VM will be put in this host group change this should
     # match the host group in your playbook you want to test
     # If this doesn't match the action (e.g. you are running web-servers')
     # it will skip it
-    ansible.hosts = "dev-server"
+    #ansible.hosts = "dev-server"
   end
 end
