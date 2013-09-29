@@ -36,6 +36,7 @@
       - mercurial
       - psycopg2
       - gunicorn
+      - uwsgi
 
   - name: install supervisor with pip pre
     action: pip name=supervisor state=present extra_args='--pre'

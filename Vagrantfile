@@ -25,7 +25,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible" do |ansible|
     # point Vagrant at the location of your playbook you want to run
     ansible.playbook = "playbooks/setup-devserver.yml"
-    ansible.inventory_path = "playbooks/hosts"
+    ansible.inventory_file = "playbooks/hosts"
+    # replace with newer vagrant versions
+    #ansible.inventory_path = "playbooks/hosts" 
     ansible.verbose = true
 
     # the Vagrant VM will be put in this host group change this should
